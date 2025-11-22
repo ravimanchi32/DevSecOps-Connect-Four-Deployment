@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE = "${JOB_NAME}:v1.${BUILD_ID}"
+        IMAGE = "$devops:v1.${BUILD_ID}"
         SONAR_TOKEN = credentials('sonar-token')      // SonarQube token
     }
 
