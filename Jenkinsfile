@@ -14,20 +14,21 @@ pipeline {
         }
 
         stage('SonarQube Scan') {
-            steps {
-                script {
-                    withSonarQubeEnv('sonar') {   // sonar = Jenkins SonarQube server name
-                        sh '''
-                           sonar-scanner \
-                           -Dsonar.projectKey=connect-four \
-                           -Dsonar.projectName=connect-four \
-                           -Dsonar.sources=. \
-                           -Dsonar.host.url=$SONAR_HOST_URL \
-                           -Dsonar.login=$SONAR_AUTH_TOKEN
-                        '''
-                    }
-                }
+    steps {
+        script {
+            withSonarQubeEnv('sonar') {
+                def scannerHome = tool 'sonar-scanner'
+                sh """
+                    ${scannerHome}/bin/sonar-scanner \
+                    -Dsonar.projectKey=connect-four \
+                    -Dsonar.projectName=connect-four \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=${SONAR_HOST_URL} \
+                    -Dsonar.login=${SONAR_AUTH_TOKEN}
+                """
             }
+        }
+    }
         }
 
         stage("Quality Gate") {
