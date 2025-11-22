@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE = "$devops:v1.${BUILD_ID}"
+       
         SONAR_TOKEN = credentials('sonar-token')      // SonarQube token
     }
 
@@ -58,11 +58,11 @@ pipeline {
         --------------------------------*/
         stage('Docker Build') {
             steps {
-                sh 'docker build -t $IMAGE .'
+                sh 'docker build -t devops .'
 
-                sh 'docker tag $IMAGE ravikumarmanchi/$JOB_NAME:v1.$BUILD_ID'
+                sh 'docker tag $IMAGE ravikumarmanchi/devops:v1.$BUILD_ID'
 
-                sh 'docker tag $IMAGE ravikumarmanchi/$JOB_NAME:latest'
+                sh 'docker tag $IMAGE ravikumarmanchi/devops:latest'
             }
         }
 
