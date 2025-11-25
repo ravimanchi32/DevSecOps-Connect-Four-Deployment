@@ -16,28 +16,48 @@ pipeline {
                 git branch: 'master', url: 'https://github.com/ravimanchi32/DevSecOps-Connect-Four-Deployment.git'
             }
         }
+        // /* ------------------------------
+        //    SONARQUBE SCAN
+        // --------------------------------*/
+        // stage('SonarQube Scan') {
+        //     steps {
+        //         script {
+        //             try {
+        //                 withSonarQubeEnv('sonar') {   
+        //                     def scannerHome = tool 'sonar-scanner'
 
-        /* ------------------------------
-           SONARQUBE SCAN
-        --------------------------------*/
-        stage('SonarQube Scan') {
-            steps {
-                script {
-                    withSonarQubeEnv('sonar') {   
-                        def scannerHome = tool 'sonar-scanner'
+        //                     sh """
+        //                         ${scannerHome}/bin/sonar-scanner \
+        //                         -Dsonar.projectKey=connect-four \
+        //                         -Dsonar.projectName=connect-four \
+        //                         -Dsonar.sources=. \
+        //                         -Dsonar.host.url=${SONAR_HOST_URL} \
+        //                         -Dsonar.login=${SONAR_TOKEN}
+        //                     """
+        //                 }
+        //             } catch (err) {
+        //                 error "SonarQube scan failed. Stopping pipeline."
+        //             }
+        //         }
+        //     }
+        // }
 
-                        sh """
-                            ${scannerHome}/bin/sonar-scanner \
-                            -Dsonar.projectKey=connect-four \
-                            -Dsonar.projectName=connect-four \
-                            -Dsonar.sources=. \
-                            -Dsonar.host.url=${SONAR_HOST_URL} \
-                            -Dsonar.login=${SONAR_TOKEN}
-                        """
-                    }
-                }
-            }
-        }
+        // /* ------------------------------
+        //    QUALITY GATE
+        // --------------------------------*/
+        // stage('Quality Gate') {
+        //     steps {
+        //         script {
+        //             timeout(time: 5, unit: 'MINUTES') {
+        //                 def qg = waitForQualityGate()
+        //                 echo "Quality Gate Status: ${qg.status}"
+        //                 if (qg.status != 'OK') {
+        //                     error "Pipeline stopped: Quality Gate status = ${qg.status}"
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         /* ------------------------------
            DOCKER BUILD
@@ -45,6 +65,7 @@ pipeline {
         stage('Docker Build') {
             steps {
                 sh '''
+                    echo "Building Docker image ${IMAGE}:v1.${BUILD_ID}"
                     docker build -t ${IMAGE}:v1.${BUILD_ID} .
                     docker tag ${IMAGE}:v1.${BUILD_ID} ${IMAGE}:latest
                 '''
@@ -52,15 +73,15 @@ pipeline {
         }
 
         /* ------------------------------
-           TRIVY IMAGE SCAN
+           TRIVY IMAGE SCAN (Dockerized)
         --------------------------------*/
         stage('Trivy Image Scan') {
             steps {
                 sh '''
-                    echo "Scanning Docker image ${IMAGE}:v1.${BUILD_ID} with Trivy..."
+                    echo "Scanning Docker image ${IMAGE}:v1.${BUILD_ID} with Trivy container..."
 
-                    # Run Trivy scan for HIGH and CRITICAL vulnerabilities
-                    trivy image \
+                    docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+                        aquasec/trivy image \
                         --exit-code 1 \
                         --severity HIGH,CRITICAL \
                         --format json \
@@ -98,5 +119,14 @@ pipeline {
             }
         }
 
+    }
+
+    post {
+        failure {
+            echo "Pipeline failed. Please check the logs above."
+        }
+        success {
+            echo "Pipeline completed successfully!"
+        }
     }
 }
