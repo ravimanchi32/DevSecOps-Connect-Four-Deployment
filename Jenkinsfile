@@ -60,38 +60,29 @@ pipeline {
         /* ------------------------------
            DOCKER BUILD
         --------------------------------*/
-        stage('Docker Build') {
-            steps {
-                sh '''
-                    docker build -t ${IMAGE}:v1.${BUILD_ID} .
-                    docker tag ${IMAGE}:v1.${BUILD_ID} ${IMAGE}:latest
-                '''
-            }
+stage('Docker Build & Push') {
+    steps {
+        script {
+            sh '''
+                docker build -t ravikumarmanchi/devops:v1.${BUILD_ID} .
+                docker tag ravikumarmanchi/devops:v1.${BUILD_ID} ravikumarmanchi/devops:latest
+            '''
         }
 
-        /* ------------------------------
-           DOCKER LOGIN
-        --------------------------------*/
-        stage('Docker Login') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'docker',
-                                                  usernameVariable: 'USER',
-                                                  passwordVariable: 'PASS')]) {
-                    sh 'echo "$PASS" | docker login -u "$USER" --password-stdin'
-                }
-            }
+        withCredentials([usernamePassword(
+            credentialsId: 'docker-hub', 
+            usernameVariable: 'DOCKER_USER', 
+            passwordVariable: 'DOCKER_PASS'
+        )]) {
+            sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
         }
 
-        /* ------------------------------
-           DOCKER PUSH
-        --------------------------------*/
-        stage('Docker Push') {
-            steps {
-                sh '''
-                    docker push ${IMAGE}:v1.${BUILD_ID}
-                    docker push ${IMAGE}:latest
-                '''
-            }
-        }
+        sh '''
+            docker push ravikumarmanchi/devops:v1.${BUILD_ID}
+            docker push ravikumarmanchi/devops:latest
+        '''
+    }
+}
+
     }
 }
