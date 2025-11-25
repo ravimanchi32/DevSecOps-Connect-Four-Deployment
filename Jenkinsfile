@@ -40,49 +40,63 @@ pipeline {
         }
 
         /* ------------------------------
-           QUALITY GATE
-        --------------------------------*/
-        // stage('Quality Gate') {
-        //     steps {
-        //         script {
-        //             timeout(time: 5, unit: 'MINUTES') {
-        //                 echo "Checking SonarQube Quality Gate..."
-        //                 def qg = waitForQualityGate()
-        //                 echo "Quality Gate Status: ${qg.status}"
-        //                 if (qg.status != 'OK') {
-        //                     error "Pipeline failed: Quality Gate status = ${qg.status}"
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-
-        /* ------------------------------
            DOCKER BUILD
         --------------------------------*/
-stage('Docker Build & Push') {
-    steps {
-        script {
-            sh '''
-                docker build -t ravikumarmanchi/devops:v1.${BUILD_ID} .
-                docker tag ravikumarmanchi/devops:v1.${BUILD_ID} ravikumarmanchi/devops:latest
-            '''
+        stage('Docker Build') {
+            steps {
+                sh '''
+                    docker build -t ${IMAGE}:v1.${BUILD_ID} .
+                    docker tag ${IMAGE}:v1.${BUILD_ID} ${IMAGE}:latest
+                '''
+            }
         }
 
-        withCredentials([usernamePassword(
-            credentialsId: 'docker-hub', 
-            usernameVariable: 'DOCKER_USER', 
-            passwordVariable: 'DOCKER_PASS'
-        )]) {
-            sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
+        /* ------------------------------
+           TRIVY IMAGE SCAN
+        --------------------------------*/
+        stage('Trivy Image Scan') {
+            steps {
+                sh '''
+                    echo "Scanning Docker image ${IMAGE}:v1.${BUILD_ID} with Trivy..."
+
+                    # Run Trivy scan for HIGH and CRITICAL vulnerabilities
+                    trivy image \
+                        --exit-code 1 \
+                        --severity HIGH,CRITICAL \
+                        --format json \
+                        --output trivy-report.json \
+                        ${IMAGE}:v1.${BUILD_ID}
+
+                    echo "Trivy scan completed. Report saved as trivy-report.json"
+                '''
+            }
+
+            post {
+                always {
+                    archiveArtifacts artifacts: 'trivy-report.json', allowEmptyArchive: true
+                }
+            }
         }
 
-        sh '''
-            docker push ravikumarmanchi/devops:v1.${BUILD_ID}
-            docker push ravikumarmanchi/devops:latest
-        '''
-    }
-}
+        /* ------------------------------
+           DOCKER LOGIN & PUSH
+        --------------------------------*/
+        stage('Docker Push') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'docker-hub', 
+                    usernameVariable: 'DOCKER_USER', 
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
+                }
+
+                sh '''
+                    docker push ${IMAGE}:v1.${BUILD_ID}
+                    docker push ${IMAGE}:latest
+                '''
+            }
+        }
 
     }
 }
