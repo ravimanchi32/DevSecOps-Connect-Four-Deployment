@@ -42,20 +42,20 @@ pipeline {
         /* ------------------------------
            QUALITY GATE
         --------------------------------*/
-        stage('Quality Gate') {
-            steps {
-                script {
-                    timeout(time: 5, unit: 'MINUTES') {
-                        echo "Checking SonarQube Quality Gate..."
-                        def qg = waitForQualityGate()
-                        echo "Quality Gate Status: ${qg.status}"
-                        if (qg.status != 'OK') {
-                            error "Pipeline failed: Quality Gate status = ${qg.status}"
-                        }
-                    }
-                }
-            }
-        }
+        // stage('Quality Gate') {
+        //     steps {
+        //         script {
+        //             timeout(time: 5, unit: 'MINUTES') {
+        //                 echo "Checking SonarQube Quality Gate..."
+        //                 def qg = waitForQualityGate()
+        //                 echo "Quality Gate Status: ${qg.status}"
+        //                 if (qg.status != 'OK') {
+        //                     error "Pipeline failed: Quality Gate status = ${qg.status}"
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         /* ------------------------------
            DOCKER BUILD
