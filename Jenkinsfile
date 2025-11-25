@@ -43,15 +43,16 @@ pipeline {
         /* ------------------------------
            QUALITY GATE
         --------------------------------*/
-        stage("Quality Gate") {
-            steps {
-                script {
-                    timeout(time: 3, unit: 'MINUTES') {
-                        waitForQualityGate abortPipeline: true
-                    }
-                }
+stage('Quality Gate') {
+    timeout(time: 10, unit: 'MINUTES') {   // Increase timeout
+        script {
+            def qg = waitForQualityGate()
+            if (qg.status != 'OK') {
+                error "Pipeline failed due to quality gate: ${qg.status}"
             }
         }
+    }
+}
 
         /* ------------------------------
            DOCKER BUILD
