@@ -44,11 +44,15 @@ pipeline {
            QUALITY GATE
         --------------------------------*/
 stage('Quality Gate') {
-    timeout(time: 10, unit: 'MINUTES') {   // Increase timeout
+    steps {
         script {
-            def qg = waitForQualityGate()
-            if (qg.status != 'OK') {
-                error "Pipeline failed due to quality gate: ${qg.status}"
+            timeout(time: 10, unit: 'MINUTES') {
+                echo "Checking SonarQube Quality Gate..."
+                def qg = waitForQualityGate()
+                echo "Quality Gate Status: ${qg.status}"
+                if (qg.status != 'OK') {
+                    error "Pipeline failed: Quality Gate status = ${qg.status}"
+                }
             }
         }
     }
