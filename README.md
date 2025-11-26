@@ -126,7 +126,7 @@ Save.
 Go to Jenkins → Manage Jenkins → Credentials → System → Global credentials
 
 Click Add Credentials →
-
+```bash
 Kind: Username with password
 
 Username: Your Docker Hub username
@@ -136,3 +136,4 @@ Password: Your Docker Hub password
 ID: docker-hub (or any name you like)
 
 Description: Docker Hub login for pipeline
+```
