@@ -92,7 +92,7 @@ Scroll to SonarQube Servers → Click Add SonarQube
 Fill:
 
 Name: sonar-server
-Server URL: http://<sonar-ip>:9000
+Server URL: http://sonar-ip:9000
 
 
 ## Then click Add → Secret Text → Paste your SonarQube Token
