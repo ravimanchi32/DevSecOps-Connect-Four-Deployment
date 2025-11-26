@@ -48,7 +48,7 @@ docker run -d --name sonarqube \
   -v sonarqube_extensions:/opt/sonarqube/extensions \
   sonarqube:latest
 ```
-# SonarQube URL
+SonarQube URL
 http://localhost:9000
 
 ```bash
