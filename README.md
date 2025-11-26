@@ -90,17 +90,17 @@ Manage Jenkins → System
 Scroll to SonarQube Servers → Click Add SonarQube
 
 Fill:
-
+```bash
 Name: sonar-server
 Server URL: http://sonar-ip:9000
-
+```
 
 ## Then click Add → Secret Text → Paste your SonarQube Token
 
 Save as:
-
+```bash
 ID: sonar-token
-
+```
 
 Select that credential under Authentication Token.
 
@@ -114,10 +114,10 @@ Manage Jenkins → Global Tool Configuration
 Scroll to SonarQube Scanner
 
 Add:
-
+```bash
 Name: sonar-scanner
 Install Automatically: YES
-
+```
 
 Save.
 
