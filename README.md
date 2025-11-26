@@ -30,3 +30,112 @@
 - Enjoy it !!!
 
 ![ConnectFour](https://user-images.githubusercontent.com/68684482/124650666-98456c00-deb7-11eb-80e7-87e999d8ab96.png)
+
+
+# 🚀 1. Run SonarQube Using Docker
+## Step 1 — Pull SonarQube Image
+
+```bash
+docker pull sonarqube:latest
+```
+
+## Step 2 — Run SonarQube Container
+```bash
+docker run -d --name sonarqube \
+  -p 9000:9000 \
+  -v sonarqube_data:/opt/sonarqube/data \
+  -v sonarqube_logs:/opt/sonarqube/logs \
+  -v sonarqube_extensions:/opt/sonarqube/extensions \
+  sonarqube:latest
+```
+# SonarQube URL
+http://localhost:9000
+
+```bash
+Default Login
+Username: admin
+Password: admin
+```
+## 🔑 2. Create SonarQube Token
+
+- 1️⃣ Login → http://localhost:9000
+- 2️⃣ Click profile (top right) → My Account
+- 3️⃣ Go to: Security → Tokens
+- 4️⃣ Enter token name: jenkins-token
+- 5️⃣ Click Generate
+- 6️⃣ Copy and save the token
+
+## 🔧 3. Install Jenkins Plugins
+
+Go to:
+# Manage Jenkins → Plugins → Available
+
+Install:
+
+- SonarQube Scanner
+
+- Pipeline
+
+- Pipeline Utility Steps
+
+- Docker Pipeline (important for docker login/build)
+
+- Credentials Binding
+
+## ⚙️ 4. Configure SonarQube in Jenkins
+
+Go to:
+Manage Jenkins → System
+
+Scroll to SonarQube Servers → Click Add SonarQube
+
+Fill:
+
+Name: sonar-server
+Server URL: http://<sonar-ip>:9000
+
+
+## Then click Add → Secret Text → Paste your SonarQube Token
+
+Save as:
+
+ID: sonar-token
+
+
+Select that credential under Authentication Token.
+
+Click Save.
+
+## 🛠️ 5. Add SonarQube Scanner in Jenkins
+
+Go to:
+Manage Jenkins → Global Tool Configuration
+
+Scroll to SonarQube Scanner
+
+Add:
+
+Name: sonar-scanner
+Install Automatically: YES
+
+
+Save.
+
+## 🐳 6. Add Docker Hub Credentials in Jenkins
+
+Go to:
+## Manage Jenkins → Credentials → System → Global Credentials → Add Credentials
+
+Select:
+
+## Kind: Username with password
+
+Enter:
+
+## Username: <your-dockerhub-username>
+## Password: <your-dockerhub-password>
+ID: docker-hub
+Description: Docker Hub login for Jenkins pipeline
+
+
+Click Save.
