@@ -67,8 +67,8 @@ Password: admin
 
 ## 🔧 3. Install Jenkins Plugins
 
-Go to:
-# Manage Jenkins → Plugins → Available
+Go to: 
+Manage Jenkins → Plugins → Available
 
 Install:
 
