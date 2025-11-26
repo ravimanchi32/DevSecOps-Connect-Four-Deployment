@@ -123,19 +123,16 @@ Save.
 
 ## 🐳 6. Add Docker Hub Credentials in Jenkins
 
-Go to:
-Manage Jenkins → Credentials → System → Global Credentials → Add Credentials
+Go to Jenkins → Manage Jenkins → Credentials → System → Global credentials
 
-Select:
+Click Add Credentials →
 
 Kind: Username with password
 
-Enter:
+Username: Your Docker Hub username
 
-Username: <your-dockerhub-username>
-Password: <your-dockerhub-password>
-ID: docker-hub
-Description: Docker Hub login for Jenkins pipeline
+Password: Your Docker Hub password
 
+ID: docker-hub (or any name you like)
 
-Click Save.
+Description: Docker Hub login for pipeline
