@@ -95,7 +95,7 @@ Name: sonar-server
 Server URL: http://sonar-ip:9000
 ```
 
-## Then click Add → Secret Text → Paste your SonarQube Token
+Then click Add → Secret Text → Paste your SonarQube Token
 
 Save as:
 ```bash
