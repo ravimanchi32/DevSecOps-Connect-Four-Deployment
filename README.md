@@ -1,4 +1,4 @@
-# DevSecOps-Connect-Four-Deployment
+# DevSecOps-Connect-game-Deployment
 
 <div align="center">
 
